@@ -1,0 +1,44 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Consulta CEP
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-grid class="padding">
+    <ion-row>
+      <ion-col size="12">
+        <ion-searchbar class="pesquisa" type="number" [(ngModel)]="this.cep"
+          (keyup)="getEndereco($event)"></ion-searchbar>
+      </ion-col>
+
+      <ion-col size="12" size-md="6">
+        <ion-list class="padding">
+          <ion-label>Dados:</ion-label>
+          <ion-item>
+            <ion-label>Rua: {{this.endereco.logradouro}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Bairro: {{this.endereco.bairro}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Cidade: {{this.endereco.localidade}}</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>Estado: {{this.endereco.uf}}</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-col>
+
+      <ion-col size="12" size-md="6">
+        <ion-label *ngIf="this.coordenates.lat == undefined">Nenhum endereço encontrado</ion-label>
+        <div #map id="map"></div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+
+</ion-content>

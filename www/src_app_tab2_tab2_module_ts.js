@@ -95,20 +95,76 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Tab2Page": () => (/* binding */ Tab2Page)
 /* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tslib */ 4762);
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! tslib */ 4762);
 /* harmony import */ var _raw_loader_tab2_page_html__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !raw-loader!./tab2.page.html */ 2477);
 /* harmony import */ var _tab2_page_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tab2.page.scss */ 2055);
-/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/core */ 7716);
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/common/http */ 1841);
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @angular/core */ 7716);
+/* harmony import */ var _ionic_angular__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @ionic/angular */ 476);
+/* harmony import */ var src_providers_viacep_viacep__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/providers/viacep/viacep */ 2930);
+
+
+
 
 
 
 
 let Tab2Page = class Tab2Page {
-    constructor() { }
+    constructor(navCtrl, viacep, http) {
+        this.navCtrl = navCtrl;
+        this.viacep = viacep;
+        this.http = http;
+        this.cep = '';
+        this.endereco = [];
+        this.vazio = '';
+        this.coordenates = {};
+    }
+    getEndereco(ev) {
+        this.cep = ev.target.value;
+        if (this.cep.length > 7) {
+            this.viacep.callService(this.cep.trim())
+                .subscribe(data => {
+                this.endereco = data;
+                let lugar = [];
+                lugar.push(data.logradouro);
+                // lugar.push(data.bairro);
+                lugar.push(data.localidade);
+                // lugar.push(data.cep);
+                // lugar.push(data.uf);
+                this.getCoordenates(lugar.join(" "));
+            });
+        }
+    }
+    getCoordenates(endereco) {
+        endereco = window.encodeURIComponent(endereco);
+        let url = `https://nominatim.openstreetmap.org/search?q=${endereco}&format=json&polygon=1&addressdetails=1`;
+        this.http.get(url).subscribe((data) => {
+            data = data[0];
+            this.coordenates = { lat: parseFloat(data.lat), lng: parseFloat(data.lon) };
+            this.initMap(this.coordenates);
+        });
+    }
+    initMap(coordenates) {
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 15,
+            center: coordenates,
+        });
+        const marker = new google.maps.Marker({
+            position: coordenates,
+            map: map,
+        });
+    }
 };
-Tab2Page.ctorParameters = () => [];
-Tab2Page = (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__decorate)([
-    (0,_angular_core__WEBPACK_IMPORTED_MODULE_3__.Component)({
+Tab2Page.ctorParameters = () => [
+    { type: _ionic_angular__WEBPACK_IMPORTED_MODULE_3__.NavController },
+    { type: src_providers_viacep_viacep__WEBPACK_IMPORTED_MODULE_2__.ViacepProvider },
+    { type: _angular_common_http__WEBPACK_IMPORTED_MODULE_4__.HttpClient }
+];
+Tab2Page.propDecorators = {
+    mapRef: [{ type: _angular_core__WEBPACK_IMPORTED_MODULE_5__.ViewChild, args: ['map', { read: _angular_core__WEBPACK_IMPORTED_MODULE_5__.ElementRef, static: false },] }]
+};
+Tab2Page = (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__decorate)([
+    (0,_angular_core__WEBPACK_IMPORTED_MODULE_5__.Component)({
         selector: 'app-tab2',
         template: _raw_loader_tab2_page_html__WEBPACK_IMPORTED_MODULE_0__.default,
         styles: [_tab2_page_scss__WEBPACK_IMPORTED_MODULE_1__.default]
@@ -130,7 +186,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (".padding {\n  padding: 2rem;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRhYjIucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0ksYUFBQTtBQUNKIiwiZmlsZSI6InRhYjIucGFnZS5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLnBhZGRpbmd7XHJcbiAgICBwYWRkaW5nOiAycmVtO1xyXG59Il19 */");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (".padding {\n  padding: 2rem;\n}\n\n#map {\n  height: 100%;\n}\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInRhYjIucGFnZS5zY3NzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0ksYUFBQTtBQUNKOztBQUVBO0VBQ0ksWUFBQTtBQUNKIiwiZmlsZSI6InRhYjIucGFnZS5zY3NzIiwic291cmNlc0NvbnRlbnQiOlsiLnBhZGRpbmd7XHJcbiAgICBwYWRkaW5nOiAycmVtO1xyXG59XHJcblxyXG4jbWFwe1xyXG4gICAgaGVpZ2h0OiAxMDAlO1xyXG59Il19 */");
 
 /***/ }),
 
@@ -145,7 +201,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\n  <ion-toolbar>\n    <ion-title>\n    </ion-title>\n  </ion-toolbar>\n</ion-header>\n\n<ion-content [fullscreen]=\"true\">\n\n  <ion-grid class=\"padding\">\n    <ion-row>\n      <ion-col size=\"12\">\n        <ion-item>\n          <ion-label position=\"floating\">Digite seu CEP</ion-label>\n          <ion-input inputmode=\"numeric\" type=\"number\" pattern=\"tel\" required></ion-input>\n        </ion-item>\n      </ion-col>\n\n      <!-- <ion-col></ion-col> -->\n\n      <ion-col>\n        <ion-list class=\"padding\">\n          <ion-label>Dados:</ion-label>\n          <ion-item>\n            <ion-label>Pokémon Yellow</ion-label>\n          </ion-item>\n          <ion-item>\n            <ion-label>Mega Man X</ion-label>\n          </ion-item>\n          <ion-item>\n            <ion-label>The Legend of Zelda</ion-label>\n          </ion-item>\n        </ion-list>\n      </ion-col>\n    </ion-row>\n  </ion-grid>\n\n\n</ion-content>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<ion-header [translucent]=\"true\">\r\n  <ion-toolbar>\r\n    <ion-title>\r\n      Consulta CEP\r\n    </ion-title>\r\n  </ion-toolbar>\r\n</ion-header>\r\n\r\n<ion-content [fullscreen]=\"true\">\r\n\r\n  <ion-grid class=\"padding\">\r\n    <ion-row>\r\n      <ion-col size=\"12\">\r\n        <ion-searchbar class=\"pesquisa\" type=\"number\" [(ngModel)]=\"this.cep\"\r\n          (keyup)=\"getEndereco($event)\"></ion-searchbar>\r\n      </ion-col>\r\n\r\n      <ion-col size=\"12\" size-md=\"6\">\r\n        <ion-list class=\"padding\">\r\n          <ion-label>Dados:</ion-label>\r\n          <ion-item>\r\n            <ion-label>Rua: {{this.endereco.logradouro}}</ion-label>\r\n          </ion-item>\r\n          <ion-item>\r\n            <ion-label>Bairro: {{this.endereco.bairro}}</ion-label>\r\n          </ion-item>\r\n          <ion-item>\r\n            <ion-label>Cidade: {{this.endereco.localidade}}</ion-label>\r\n          </ion-item>\r\n          <ion-item>\r\n            <ion-label>Estado: {{this.endereco.uf}}</ion-label>\r\n          </ion-item>\r\n        </ion-list>\r\n      </ion-col>\r\n\r\n      <ion-col size=\"12\" size-md=\"6\">\r\n        <ion-label *ngIf=\"this.coordenates.lat == undefined\">Nenhum endereço encontrado</ion-label>\r\n        <div #map id=\"map\"></div>\r\n      </ion-col>\r\n    </ion-row>\r\n  </ion-grid>\r\n\r\n\r\n</ion-content>\r\n");
 
 /***/ })
 
